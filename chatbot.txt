@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recycling Center Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        #chatbox {
+            width: 400px;
+            height: 500px;
+            border: 1px solid #ccc;
+            background: #fff;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        #userInput {
+            width: 300px;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #sendBtn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recycling Center Chatbot</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type your query here...">
+    <button id="sendBtn">Send</button>
+
+    <script>
+        document.getElementById('sendBtn').addEventListener('click', async function() {
+            const query = document.getElementById('userInput').value;
+            if (!query) return;
+
+            const chatbox = document.getElementById('chatbox');
+            chatbox.innerHTML += `<p><strong>You:</strong> ${query}</p>`;
+            document.getElementById('userInput').value = '';
+
+            try {
+                const response = await fetch('<%= chatbotUrl %>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query }),
+                });
+                const data = await response.json();
+                chatbox.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+            } catch (error) {
+                chatbox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Could not connect to the chatbot.</p>`;
+            }
+
+            chatbox.scrollTop = chatbox.scrollHeight;
+        });
+
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('sendBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
